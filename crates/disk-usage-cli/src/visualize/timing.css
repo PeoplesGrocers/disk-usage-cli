@@ -1,0 +1,86 @@
+
+
+:global(.timerSection) {
+  flex: 0 0 240px;
+}
+
+:global(.timer) {
+  font-family: monospace;
+  font-size: 48px;
+  text-align: center;
+  padding: 20px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.segmentName {
+  align-self: center;
+}
+.segmentTime {
+  align-self: center;
+  color: #666;
+}
+.segmentList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+.ruleItem {
+  box-sizing: border-box;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  transition: transform 0.2s;
+
+  display: flex;
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+}
+
+.ruleItem:hover {
+  background: #dbdbdc;
+}
+
+.numberCircle {
+  background-color: #2ecc71;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.ruleText {
+  color: #333;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+
+/* Loading spinner version */
+.loader {
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  margin-right: 20px;
+  flex-shrink: 0;
+  border: 3px solid rgba(46, 204, 113, 0.2);
+  border-top: 3px solid #2ecc71;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

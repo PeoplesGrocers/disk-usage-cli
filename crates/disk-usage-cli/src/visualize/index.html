@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf8" />
+    <title>duh - Disk Usage with .gitignore Awareness</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="index.css" />
+    <meta property="og:title" content="esbuild - Bundle Size Analyzer" />
+    <meta property="og:type" content="website" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <details id="timelinePanel" open>
+      <summary
+        id="timeline-drawer-toggle"
+        class="timelineDrawerToggle startHidden"
+      >
+        ⏱️
+      </summary>
+      <div id="timeline-drawer" class="timelineDrawer">
+        <div id="timeline-drawer-content" class="timelineDrawerContent">
+          <div class="timerSection">
+            <div class="timer">1.6s</div>
+          </div>
+          <ul class="segmentList"></ul>
+        </div>
+      </div>
+    </details>
+    <div id="startPanel">
+      <section>
+        <div class="center">
+          <div id="logo">
+            <h1>duh</h1>
+            <blockquote>Disk Usage with .gitignore Awareness</blockquote>
+          </div>
+        </div>
+        <noscript>
+          <p class="noscript">
+            &#x274C; This page requires JavaScript. Please enable JavaScript and
+            reload the page.
+          </p>
+        </noscript>
+      </section>
+    </div>
+    <div id="resultsPanel">
+      <div id="summaryPanel"></div>
+      <div id="warningsPanel"></div>
+      <div id="settingsPanel">
+        <div class="chartSwitcher">
+          <span
+            ><a id="useTreemap" href="javascript:void 0">Treemap Chart</a></span
+          >
+          <span
+            ><a id="useSunburst" href="javascript:void 0"
+              >Sunburst Chart</a
+            ></span
+          >
+          <span><a id="useFlame" href="javascript:void 0">Flame Chart</a></span>
+        </div>
+      </div>
+      <div id="chartPanel"></div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>

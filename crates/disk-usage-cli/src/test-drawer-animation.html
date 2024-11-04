@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      /* Base Styles */
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Metrics Panel Structure */
+      .timeline-panel {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 0;
+      }
+
+      .timeline-panel:not([open]) {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: auto;
+      }
+
+      /* Drawer Toggle Button */
+      .timeline-drawer-toggle {
+        width: 40px;
+        height: 40px;
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        flex: 0 0 40px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Drawer Content */
+      .timeline-drawer {
+        box-sizing: border-box;
+        padding: 16px;
+        width: 300px;
+        margin: 8px auto 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background: white;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Simulate Button Styles */
+      .simulate-button {
+        margin-top: 20px;
+        padding: 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+      }
+
+      .simulate-button:hover {
+        background: #f5f5f5;
+      }
+
+      /* Animation States and Transitions */
+      .timeline-drawer-toggle {
+        opacity: 1;
+        transition: opacity 150ms ease-in;
+        transition-delay: 250ms;
+      }
+
+      .timeline-drawer-toggle.start-hidden {
+        opacity: 0;
+      }
+
+      .timeline-drawer {
+        transform-origin: top left;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .timeline-drawer.shrink {
+        transform: translate(calc(-50vw + 150px + 29px), -49px) scale(0.133);
+        pointer-events: none;
+        border-width: 6px;
+      }
+
+      .timeline-drawer-content {
+        transition: opacity 0.4s;
+      }
+
+      .timeline-drawer.shrink .timeline-drawer-content {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <details id="timeline-panel" class="timeline-panel" open>
+      <summary
+        id="timeline-drawer-toggle"
+        class="timeline-drawer-toggle start-hidden"
+      >
+        ⏱️
+      </summary>
+      <div id="timeline-drawer" class="timeline-drawer">
+        <div class="timeline-drawer-content">
+          <h3>Loading Times</h3>
+          <p>Initial Load: 1.2s</p>
+          <p>API Calls: 0.8s</p>
+          <p>Asset Loading: 2.1s</p>
+        </div>
+      </div>
+    </details>
+    <button onclick="simulatePageLoad()" class="simulate-button">
+      Simulate Page Load
+    </button>
+    <script>
+      const panel = document.getElementById("timeline-panel");
+      const drawer = document.getElementById("timeline-drawer");
+      const drawerToggle = document.getElementById("timeline-drawer-toggle");
+
+      function animateHeight() {
+        const startHeight = panel.offsetHeight;
+        panel.style.height = startHeight + "px";
+        panel.style.transition = "height 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+
+        requestAnimationFrame(() => {
+          // Triggering the reflow is critical for the transition to work
+          void panel.offsetHeight;
+          panel.style.height = "0px";
+        });
+      }
+
+      function simulatePageLoad() {
+        animateHeight();
+        requestAnimationFrame(() => {
+          drawer.classList.add("shrink");
+          panel.classList.add("shrink");
+          drawerToggle.classList.remove("start-hidden");
+
+          setTimeout(() => {
+            panel.removeAttribute("open");
+            drawer.classList.remove("shrink");
+            panel.classList.remove("shrink");
+
+            panel.style.height = "";
+            panel.style.transition = ""; // clean up the transition
+          }, 400);
+        });
+      }
+    </script>
+  </body>
+</html>
