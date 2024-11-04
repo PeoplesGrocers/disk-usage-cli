@@ -1,0 +1,45 @@
+
+
+.timerSection {
+  flex: 0 0 240px;
+}
+
+.timer {
+  font-family: monospace;
+  font-size: 48px;
+  text-align: center;
+  padding: 20px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.activeSegment {
+  color: #007bff;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.completedList {
+  flex: 1;
+  padding: 20px;
+}
+
+.completedList ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.completedList li {
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #28a745;
+}
+
+.segmentTime {
+  float: right;
+  color: #666;
+}

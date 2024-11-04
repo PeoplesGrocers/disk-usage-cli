@@ -1,0 +1,6 @@
+[workspace]
+members = ["crates/patched_ignore", "crates/disk-usage-cli"]
+resolver = "2"
+
+# [patch.crates-io]
+# ignore = { path = "crates/patched-ignore" }

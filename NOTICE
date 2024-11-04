@@ -1,0 +1,17 @@
+duh - Disk Usage with .gitignore Awareness
+Copyright 2024 Peoples Grocers LLC
+
+This product includes software developed by Peoples Grocers LLC.
+
+This product includes software from the following projects:
+
+1. ignore (MIT/Unlicense)
+   Original work: https://github.com/BurntSushi/ripgrep/tree/master/crates/ignore
+   The following components are derived from this project:
+
+   - crates/patched_ignore/
+
+2. esbuild.github.io/src/anlayze No License
+   Original work: https://github.com/esbuild.github.io
+   The following components are from this project:
+   - crates/disk-usage-cli/src/visualize/
