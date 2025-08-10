@@ -15,9 +15,24 @@
 use clap::{Arg, ArgAction};
 use ignore::WalkBuilder;
 use indexmap::IndexMap;
+use indicatif::{ProgressBar, ProgressStyle};
+use num_format::{Locale, SystemLocale, ToFormattedString};
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
 
 mod visualize;
+
+/// Format a number with locale-aware thousands separators
+fn format_number(num: u64) -> String {
+    // Try to use system locale, fall back to US English locale if it fails
+    match SystemLocale::default() {
+        Ok(locale) => num.to_formatted_string(&locale),
+        Err(_) => {
+            // Fallback: US English locale with comma separators
+            num.to_formatted_string(&Locale::en)
+        }
+    }
+}
 
 fn main() {
     let mut command = clap::Command::new("duh")
@@ -85,7 +100,12 @@ fn main() {
         .arg(
             Arg::new("mode")
                 .long("mode")
-                .default_value("ignored")
+                // I used to have the default value as "ignored" because I
+                // thought I would want to see only the ignored files, but in
+                // practice I was always interested in seeing the breakdown.
+                // Also it takes the same amount of time so we aren't saving
+                // anything.
+                .default_value("du")
                 .value_parser(clap::value_parser!(Mode))
                 .action(ArgAction::Set)
                 .help(""),
@@ -188,7 +208,29 @@ enum Mode {
     NotIgnored,
 }
 
+impl Mode {
+    fn description(&self) -> &'static str {
+        match self {
+            Mode::Du => "all files (both ignored and not ignored)",
+            Mode::Ignored => "only files that are ignored by .gitignore rules",
+            Mode::NotIgnored => "only files that are NOT ignored by .gitignore rules",
+        }
+    }
+
+    fn name(&self) -> &'static str {
+        match self {
+            Mode::Du => "du",
+            Mode::Ignored => "ignored",
+            Mode::NotIgnored => "not-ignored",
+        }
+    }
+}
+
 fn process_directory(path: &str, config: &Config) {
+    // Explain what mode is being used
+    eprintln!("Mode: '{}' - analyzing {}", config.mode.name(), config.mode.description());
+    eprintln!("Note: Progress bar shows ALL files visited, but results will only include files matching the selected mode.\n");
+
     let walker = WalkBuilder::new(path).hidden(config.include_hidden).filter_entry(|entry| {
         // It seems that .git directories are not automatically ignored. Weird.
         entry.file_name().to_str().map(|s| { s != ".git"}).unwrap_or(true)
@@ -205,10 +247,42 @@ fn process_directory(path: &str, config: &Config) {
     //    .canonicalize()
     //    .unwrap();
 
+    // Setup progress bar with spinner style
+    let pb = ProgressBar::new_spinner();
+    let spinner_style = ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] {msg}")
+        .unwrap()
+        .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ ");
+    pb.set_style(spinner_style);
+    pb.set_message("Scanning files... (0 files)");
+
+    // Throttling mechanism - update at most 10 times per second
+    let mut file_count = 0u64;
+    let mut ignored_count = 0u64; // Count of ignored files (for du mode breakdown)
+    let mut not_ignored_count = 0u64; // Count of not ignored files (for du mode breakdown)
+    let mut last_update = Instant::now();
+    let update_interval = Duration::from_millis(100); // 100ms = 10 times per second
+
     for result in walker {
         match result {
             Err(_) => continue,
             Ok(dent) => {
+                // Update file count and progress bar (throttled)
+                file_count += 1;
+                
+                // Track ignored vs not-ignored counts for du mode breakdown
+                if dent.ignored {
+                    ignored_count += 1;
+                } else {
+                    not_ignored_count += 1;
+                }
+                
+                let now = Instant::now();
+                if now.duration_since(last_update) >= update_interval {
+                    pb.set_message(format!("Scanning files... ({} files)", format_number(file_count)));
+                    pb.tick();
+                    last_update = now;
+                }
+
                 #[cfg(unix)]
                 use std::os::unix::fs::MetadataExt;
                 let size = {
@@ -329,6 +403,30 @@ fn process_directory(path: &str, config: &Config) {
             }
         }
     }
+
+    // Finish progress bar with final file count
+    let final_message = match config.mode {
+        Mode::Du => {
+            format!("Visited {} files, {} ignored, {} not ignored", 
+                format_number(file_count),
+                format_number(ignored_count),
+                format_number(not_ignored_count)
+            )
+        },
+        Mode::Ignored => {
+            format!("Visited {} files, {} ignored", 
+                format_number(file_count), 
+                format_number(ignored_count)
+            )
+        },
+        Mode::NotIgnored => {
+            format!("Visited {} files, {} not ignored", 
+                format_number(file_count), 
+                format_number(not_ignored_count)
+            )
+        }
+    };
+    pb.finish_with_message(final_message);
 
     let mut pairs: Vec<(PathBuf, (u64, u64, bool))> = groups.into_iter().collect();
 
