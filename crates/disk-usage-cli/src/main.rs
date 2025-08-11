@@ -229,7 +229,11 @@ impl Mode {
 fn process_directory(path: &str, config: &Config) {
     // Explain what mode is being used
     eprintln!("Mode: '{}' - analyzing {}", config.mode.name(), config.mode.description());
-    eprintln!("Note: Progress bar shows ALL files visited, but results will only include files matching the selected mode.\n");
+    match config.mode {
+        Mode::Du => (),
+        Mode::Ignored => eprintln!("Note: Progress bar shows ALL files visited, but results will only include ignored files.\n"),
+        Mode::NotIgnored => eprintln!("Note: Progress bar shows ALL files visited, but results will only include not ignored files.\n"),
+    }
 
     let walker = WalkBuilder::new(path).hidden(config.include_hidden).filter_entry(|entry| {
         // It seems that .git directories are not automatically ignored. Weird.
